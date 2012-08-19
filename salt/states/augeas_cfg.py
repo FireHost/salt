@@ -16,6 +16,30 @@ def __virtual__():
         return "augeas"
 
 
+def _resolve_changes(sfn, dfn):
+    ret = {}
+    # Augeas won't tell us if it made any changes, so we have to go about this
+    # the hard way. The existence of the backup file will tell us.
+    if os.path.isfile(sfn) and os.path.isfile(dfn):
+        with nested(open(sfn, 'rb'), open(dfn, 'rb')) as (src, dst):
+            diff = ''.join(difflib.unified_diff(src.readlines(),
+                                                dst.readlines(),
+                                                sfn,
+                                                dfn))
+        if __opts__['test']:
+            if len(diff) > 0:
+                ret['comment'] = ('Files differ, would make the following '
+                                  'changes\n%s' % diff)
+                ret['result'] = None
+            os.remove(dfn)
+        else:
+            if len(diff) > 0:
+                ret['changes'] = {'diff': diff}
+                ret['comment'] = 'Changes made'
+            os.remove(sfn)
+    return ret
+
+
 def setvalue(name, expressions):
     ret = {'name': name,
            'result': True,
@@ -45,7 +69,7 @@ def setvalue(name, expressions):
 
     for (subpath, value) in expressions:
         try:
-            aug.set('/files/%s/%s' % (name, subpath), value)
+            aug.set('/files%s/%s' % (name, subpath), value)
         except ValueError as e:
             ret['comment'] = 'Multiple values: %s' % e
             ret['result'] = False
@@ -58,47 +82,46 @@ def setvalue(name, expressions):
         ret['result'] = False
         return ret
 
-    # Augeas won't tell us if it made any changes, so we have to go about this
-    # the hard way. The existence of the backup file will tell us.
-    if os.path.isfile(sfn) and os.path.isfile(dfn):
-        with nested(open(sfn, 'rb'), open(dfn, 'rb')) as (src, dst):
-            diff = ''.join(difflib.unified_diff(src.readlines(),
-                                                dst.readlines(),
-                                                sfn,
-                                                dfn))
-        if __opts__['test']:
-            if len(diff) > 0:
-                ret['comment'] = ('Files differ, would make the following '
-                                  'changes\n%s' % diff)
-                ret['result'] = None
-            os.remove(dfn)
-        else:
-            if len(diff) > 0:
-                ret['changes']['diff'] = diff
-                ret['comment'] = 'Changes made'
-            os.remove(sfn)
-
+    ret.update(_resolve_changes(sfn, dfn))
     return ret
 
 
-def remove(name):
+def remove(name, values):
     ret = {'name': name,
            'result': True,
            'changes': {},
            'comment': ''}
 
-    if __opts__['test']:
-        ret['comment'] = 'No changes made for testing'
-        return ret
+    from augeas import Augeas
 
-    result = __salt__['augeas.remove'](name)
-
-    if not ['retval']:
+    if len(values) < 1:
+        ret['comment'] = "No values given"
         ret['result'] = False
-        ret['comment'] = result['error']
         return ret
 
-    ret['comment'] = 'Changed %i lines' % result['count']
-    if result['count'] > 0:
-        ret['changes'] = {'removed': result['count']}
+    if __opts__['test']:
+        aug = Augeas(flags=Augeas.SAVE_NEWFILE)
+        sfn = name
+        dfn = '%s.augnew' % name
+    else:
+        aug = Augeas(flags=Augeas.SAVE_BACKUP)
+        sfn = '%s.augsave' % name
+        dfn = name
+
+    if not os.path.isfile(name):
+        ret['comment'] = "Unable to find file '%s'" % name
+        ret['result'] = False
+        return ret
+
+    for value in values:
+        aug.remove('/files%s/%s' % (name, value))
+
+    try:
+        aug.save()
+    except IOError as e:
+        ret['comment'] = str(e)
+        ret['result'] = False
+        return ret
+
+    ret.update(_resolve_changes(sfn, dfn))
     return ret
