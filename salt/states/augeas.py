@@ -39,5 +39,6 @@ def remove(name):
         return ret
 
     ret['comment'] = 'Changed %i lines' % result['count']
-    ret['changes'] = {'removed': result['count']}
+    if result['count'] > 0:
+        ret['changes'] = {'removed': result['count']}
     return ret
