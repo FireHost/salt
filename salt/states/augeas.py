@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 def setname(name):
     ret = {'setname': name,
            'result': True,
+           'changes': {},
            'comment': ''}
 
     if __opts__['test']:
@@ -23,6 +24,7 @@ def setname(name):
 def remove(name):
     ret = {'remove': name,
            'result': True,
+           'changes': {},
            'comment': ''}
 
     if __opts__['test']:
@@ -37,4 +39,5 @@ def remove(name):
         return ret
 
     ret['comment'] = 'Changed %i lines' % result['count']
+    ret['changes'] = {'removed': result['count']}
     return ret
