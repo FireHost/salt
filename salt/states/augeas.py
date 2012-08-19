@@ -3,8 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def setname(name):
-    ret = {'setname': name,
+def setvalue(name):
+    ret = {'setvalue': name,
            'result': True,
            'changes': {},
            'comment': ''}
@@ -13,7 +13,7 @@ def setname(name):
         ret['comment'] = 'No changes made for testing'
         return ret
 
-    result = __salt__['augeas.setname'](name)
+    result = __salt__['augeas.setvalue'](name)
 
     if not ['retval']:
         ret['result'] = False
