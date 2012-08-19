@@ -77,7 +77,8 @@ def setvalue(name, expressions):
             return ret
         except TypeError as e:
             ret['comment'] = ("Error setting values, wrong type\n"
-                              "Expression was '%s' '%s'" % (path, value))
+                              "Expression was '%s' '%s'\n"
+                              "Try quoting the value" % (path, value))
             ret['result'] = False
             return ret
 
