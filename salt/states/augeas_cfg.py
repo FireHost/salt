@@ -16,7 +16,7 @@ def __virtual__():
         return "augeas"
 
 
-def setvalue(name, *expressions):
+def setvalue(name, expressions):
     ret = {'setvalue': name,
            'result': True,
            'changes': {},
