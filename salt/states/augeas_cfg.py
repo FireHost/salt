@@ -3,6 +3,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def __virtual__():
+    try:
+        from augeas import Augeas
+        _ = Augeas
+    except ImportError:
+        return False
+    else:
+        return "augeas"
+
+
 def setvalue(name):
     ret = {'setvalue': name,
            'result': True,
