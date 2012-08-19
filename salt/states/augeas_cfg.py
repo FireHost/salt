@@ -22,14 +22,14 @@ def setvalue(name, *expressions):
            'changes': {},
            'comment': ''}
 
-    import augeas
+    from augeas import Augeas
 
     if __opts__['test']:
-        aug = augeas.Augeas(flags=augeas.SAVE_NEWFILE)
+        aug = Augeas(flags=Augeas.SAVE_NEWFILE)
         sfn = name
         dfn = '%s.augnew' % name
     else:
-        aug = augeas.Augeas(flags=augeas.SAVE_BACKUP)
+        aug = Augeas(flags=Augeas.SAVE_BACKUP)
         sfn = '%s.augsave' % name
         dfn = name
 
