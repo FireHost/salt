@@ -24,6 +24,11 @@ def setvalue(name, *expressions):
 
     from augeas import Augeas
 
+    if len(expressions) < 1:
+        ret['comment'] = "No expressions given"
+        ret['result'] = False
+        return ret
+
     if __opts__['test']:
         aug = Augeas(flags=Augeas.SAVE_NEWFILE)
         sfn = name
