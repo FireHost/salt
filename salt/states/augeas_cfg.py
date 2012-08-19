@@ -59,8 +59,8 @@ def setvalue(name, expressions):
         return ret
 
     with nested(open(sfn, 'rb'), open(dfn, 'rb')) as (src, dst):
-        diff = ''.join(difflib.unified_diff(sfn.readlines(),
-                                            dfn.readlines(),
+        diff = ''.join(difflib.unified_diff(src.readlines(),
+                                            dst.readlines(),
                                             sfn,
                                             dfn))
     if __opts__['test']:
