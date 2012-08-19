@@ -69,9 +69,15 @@ def setvalue(name, expressions):
 
     for (subpath, value) in expressions:
         try:
-            aug.set('/files%s/%s' % (name, subpath), value)
+            path = '/files%s/%s' % (name, subpath)
+            aug.set(path, value)
         except ValueError as e:
             ret['comment'] = 'Multiple values: %s' % e
+            ret['result'] = False
+            return ret
+        except TypeError as e:
+            ret['comment'] = ("Error setting values, wrong type\n"
+                              "Expression was '%s' '%s'" % (path, value))
             ret['result'] = False
             return ret
 
@@ -114,7 +120,14 @@ def remove(name, values):
         return ret
 
     for value in values:
-        aug.remove('/files%s/%s' % (name, value))
+        try:
+            path = '/files%s/%s' % (name, value)
+            aug.remove(path)
+        except TypeError as e:
+            ret['comment'] = ("Error removing, wrong type\n"
+                              "Expression was '%s'" % path)
+            ret['result'] = False
+            return ret
 
     try:
         aug.save()
