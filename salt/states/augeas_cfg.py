@@ -20,7 +20,7 @@ def setvalue(name, expressions):
     ret = {'setvalue': name,
            'result': True,
            'changes': {},
-           'comment': ''}
+           'comment': 'No changes made'}
 
     from augeas import Augeas
 
@@ -58,21 +58,24 @@ def setvalue(name, expressions):
         ret['result'] = False
         return ret
 
-    with nested(open(sfn, 'rb'), open(dfn, 'rb')) as (src, dst):
-        diff = ''.join(difflib.unified_diff(src.readlines(),
-                                            dst.readlines(),
-                                            sfn,
-                                            dfn))
-    if __opts__['test']:
-        if len(diff) > 0:
-            ret['comment'] = ('Files differ, would make the following '
-                             'changes\n%s' % diff)
-        os.remove(dfn)
-    else:
-        if len(diff) > 0:
-            ret['changes']['diff'] = diff
-            ret['comment'] = 'Changes made'
-        os.remove(sfn)
+    # Augeas won't tell us if it made any changes, so we have to go about this
+    # the hard way. The existence of the backup file will tell us.
+    if os.path.isfile(sfn) and os.path.isfile(dfn):
+        with nested(open(sfn, 'rb'), open(dfn, 'rb')) as (src, dst):
+            diff = ''.join(difflib.unified_diff(src.readlines(),
+                                                dst.readlines(),
+                                                sfn,
+                                                dfn))
+        if __opts__['test']:
+            if len(diff) > 0:
+                ret['comment'] = ('Files differ, would make the following '
+                                 'changes\n%s' % diff)
+            os.remove(dfn)
+        else:
+            if len(diff) > 0:
+                ret['changes']['diff'] = diff
+                ret['comment'] = 'Changes made'
+            os.remove(sfn)
 
     return ret
 
