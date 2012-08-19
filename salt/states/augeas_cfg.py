@@ -17,7 +17,7 @@ def __virtual__():
 
 
 def setvalue(name, expressions):
-    ret = {'setvalue': name,
+    ret = {'name': name,
            'result': True,
            'changes': {},
            'comment': 'No changes made'}
@@ -81,7 +81,7 @@ def setvalue(name, expressions):
 
 
 def remove(name):
-    ret = {'remove': name,
+    ret = {'name': name,
            'result': True,
            'changes': {},
            'comment': ''}
