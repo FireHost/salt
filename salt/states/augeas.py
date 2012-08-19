@@ -3,8 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def setvalue(value):
-    ret = {'setvalue': value,
+def setname(name):
+    ret = {'setname': name,
            'result': True,
            'comment': ''}
 
@@ -12,7 +12,7 @@ def setvalue(value):
         ret['comment'] = 'No changes made for testing'
         return ret
 
-    result = __salt__['augeas.setvalue'](value)
+    result = __salt__['augeas.setname'](name)
 
     if not ['retval']:
         ret['result'] = False
@@ -20,8 +20,8 @@ def setvalue(value):
     return ret
 
 
-def remove(path):
-    ret = {'remove': path,
+def remove(name):
+    ret = {'remove': name,
            'result': True,
            'comment': ''}
 
@@ -29,7 +29,7 @@ def remove(path):
         ret['comment'] = 'No changes made for testing'
         return ret
 
-    result = __salt__['augeas.remove'](path)
+    result = __salt__['augeas.remove'](name)
 
     if not ['retval']:
         ret['result'] = False
