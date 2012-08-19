@@ -38,9 +38,9 @@ def setvalue(name, *expressions):
         ret['result'] = False
         return ret
 
-    for expr in expressions:
+    for (subpath, value) in expressions:
         try:
-            aug.set('/files/%s/%s' % (name, expr))
+            aug.set('/files/%s/%s' % (name, subpath), value)
         except ValueError as e:
             ret['comment'] = 'Multiple values: %s' % e
             ret['result'] = False
