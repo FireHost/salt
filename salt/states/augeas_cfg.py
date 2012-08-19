@@ -68,9 +68,9 @@ def setvalue(name, expressions):
                                                 dfn))
         if __opts__['test']:
             if len(diff) > 0:
-                ret['changes']['diff'] = diff
                 ret['comment'] = ('Files differ, would make the following '
-                                  'changes')
+                                  'changes\n%s' % diff)
+                ret['result'] = None
             os.remove(dfn)
         else:
             if len(diff) > 0:
