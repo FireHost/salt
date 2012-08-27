@@ -1029,6 +1029,10 @@ class ClearFuncs(object):
                 if self.opts.get('permissive_pki_access', False) \
                   and fmode.st_gid in groups:
                     return True
+            # check if writable by group or other
+            elif not (stat.S_IWGRP & fmode.st_mode or
+              stat.S_IWOTH & fmode.st_mode):
+                return True
         else:
             if stat.S_IWOTH & fmode.st_mode:
                 # don't allow others to write to the file
