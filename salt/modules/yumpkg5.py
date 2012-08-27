@@ -163,7 +163,7 @@ def install(pkg, refresh=False, repo='', skip_verify=False, **kwargs):
     '''
     old = list_pkgs()
 
-    cmd = 'yum -y {repo} {gpgcheck} install {pkg}'.format(
+    cmd = 'yum -q -y {repo} {gpgcheck} install {pkg}'.format(
         repo='--enablerepo={0}'.format(repo) if repo else '',
         gpgcheck='--nogpgcheck' if skip_verify else '',
         pkg=pkg,
