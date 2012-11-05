@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 def __virtual__():
     try:
         from augeas import Augeas
-        _ = Augeas
     except ImportError:
         return False
     else:
@@ -45,8 +44,6 @@ def setvalue(name, expressions):
            'result': True,
            'changes': {},
            'comment': 'No changes made'}
-
-    from augeas import Augeas
 
     if len(expressions) < 1:
         ret['comment'] = "No expressions given"
@@ -103,8 +100,6 @@ def remove(name, values):
            'result': True,
            'changes': {},
            'comment': ''}
-
-    from augeas import Augeas
 
     if len(values) < 1:
         ret['comment'] = "No values given"
